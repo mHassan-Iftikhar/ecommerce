@@ -20,7 +20,7 @@ const AllProductsSection: FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [productToEdit, setProductToEdit] = useState<Product | null>(null);
+  // Removed unused productToEdit state
   const [editFormData, setEditFormData] = useState<Product>({
     id: '',
     title: '',
@@ -41,7 +41,6 @@ const AllProductsSection: FC = () => {
   };
 
   const handleEditProduct = (product: Product) => {
-    setProductToEdit(product);
     setEditFormData(product);
     setShowEditModal(true);
   };
@@ -68,12 +67,10 @@ const AllProductsSection: FC = () => {
     toast.success('Product updated successfully');
     
     setShowEditModal(false);
-    setProductToEdit(null);
   };
 
   const cancelEdit = () => {
     setShowEditModal(false);
-    setProductToEdit(null);
   };
 
   const confirmDeleteProduct = () => {

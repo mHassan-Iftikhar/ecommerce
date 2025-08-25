@@ -1,15 +1,14 @@
 import { useState, type FC } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { AuthManager } from "../../../../utils/AuthManager";
+import { Link } from "react-router-dom";
 
-const LoginForm: FC = () => {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: ""
-  });
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+interface LoginFormProps {
+  onSubmit: (email: string, password: string) => Promise<void>;
+  errorMessage: string;
+  isLoading: boolean;
+}
+
+const LoginForm: FC<LoginFormProps> = ({ onSubmit, errorMessage, isLoading }) => {
+  const [formData, setFormData] = useState({ email: "", password: "" });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -18,28 +17,7 @@ const LoginForm: FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError("");
-
-    try {
-      if (!formData.email || !formData.password) {
-        setError("Please fill in all fields");
-        return;
-      }
-
-      const result = AuthManager.validateLogin(formData.email, formData.password);
-      
-      if (result.success && result.user) {
-        AuthManager.setAuth(result.user);
-        navigate("/");
-      } else {
-        setError(result.error || "Invalid email or password");
-      }
-    } catch (err) {
-      setError("An error occurred during login");
-    } finally {
-      setIsLoading(false);
-    }
+    await onSubmit(formData.email, formData.password);
   };
 
   return (
@@ -58,9 +36,9 @@ const LoginForm: FC = () => {
             <p className="text-gray-600 mt-2">Access your account</p>
           </div>
 
-          {error && (
+          {errorMessage && (
             <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-              {error}
+              {errorMessage}
             </div>
           )}
 

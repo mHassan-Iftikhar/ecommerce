@@ -1,5 +1,5 @@
 import { useState, type FC } from "react";
-import { toast, ConfirmationModal } from "../../../components/ui";
+import { toast } from "../../../components/ui";
 
 interface Order {
   id: string;
