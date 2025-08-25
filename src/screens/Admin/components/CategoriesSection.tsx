@@ -25,6 +25,8 @@ const CategoriesSection: FC = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [categoryToEdit, setCategoryToEdit] = useState<string | null>(null);
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addCategoryName, setAddCategoryName] = useState("");
 
   useEffect(() => {
     loadCategories();
@@ -149,21 +151,80 @@ const CategoriesSection: FC = () => {
     setNewCategoryName("");
   };
 
+  const handleAddCategory = () => {
+    if (!addCategoryName.trim()) {
+      toast.error('Please enter a valid category name');
+      return;
+    }
+
+    // Check if category already exists
+    const categoryExists = categories.some(
+      category => category.name.toLowerCase() === addCategoryName.trim().toLowerCase()
+    );
+
+    if (categoryExists) {
+      toast.error('Category already exists');
+      return;
+    }
+
+    // Create a placeholder product for the new category
+    try {
+      const products: Product[] = JSON.parse(localStorage.getItem('products') || '[]');
+      
+      // Add a new placeholder product to create the category
+      const newProduct: Product = {
+        id: Date.now().toString(),
+        title: 'Sample Product',
+        price: 0,
+        image: '',
+        description: 'This is a sample product. Please edit or delete it.',
+        rating: 5,
+        category: addCategoryName.trim()
+      };
+
+      const updatedProducts = [...products, newProduct];
+      localStorage.setItem('products', JSON.stringify(updatedProducts));
+      
+      // Reload categories
+      loadCategories();
+      
+      toast.success(`Category "${addCategoryName.trim()}" has been created with a sample product`);
+    } catch (error) {
+      console.error('Error adding category:', error);
+      toast.error('Error adding category');
+    } finally {
+      cancelAdd();
+    }
+  };
+
+  const cancelAdd = () => {
+    setShowAddModal(false);
+    setAddCategoryName("");
+  };
+
   return (
     <div className="p-4 md:p-8">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
         <h2 className="text-2xl font-medium mb-4 md:mb-0">Categories</h2>
         
-        {/* Search Bar */}
-        <div className="relative w-full md:w-96">
-          <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search categories..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-          />
+        {/* Search Bar and Add Category Button */}
+        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+          <div className="relative w-full md:w-96">
+            <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search categories..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+          </div>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium whitespace-nowrap"
+          >
+            Add Category
+          </button>
         </div>
       </div>
 
@@ -288,6 +349,47 @@ const CategoriesSection: FC = () => {
                 className="flex-1 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Category Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">
+              Add New Category
+            </h3>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Category Name
+              </label>
+              <input
+                type="text"
+                value={addCategoryName}
+                onChange={(e) => setAddCategoryName(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter category name"
+                autoFocus
+              />
+            </div>
+            <p className="text-sm text-gray-600 mb-6">
+              A sample product will be created for this category. You can edit or delete it later.
+            </p>
+            <div className="flex space-x-3">
+              <button
+                onClick={cancelAdd}
+                className="flex-1 px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddCategory}
+                className="flex-1 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Add Category
               </button>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { useState, type FC } from "react";
+import { useState, useEffect, type FC } from "react";
 import { Plus, X } from "lucide-react";
 import { toast } from "../../../components/ui";
 
@@ -28,8 +28,21 @@ const AddProductsSection: FC = () => {
 
   const [additionalImages, setAdditionalImages] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [customCategory, setCustomCategory] = useState("");
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  // Load existing categories
+  useEffect(() => {
+    const products = JSON.parse(localStorage.getItem('products') || '[]');
+    const uniqueCategories = [...new Set(
+      products
+        .map((product: Product) => product.category?.trim())
+        .filter((category: string | undefined) => category && category.length > 0)
+    )].sort() as string[];
+    setCategories(uniqueCategories);
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -87,6 +100,7 @@ const AddProductsSection: FC = () => {
         inStock: true
       });
       setAdditionalImages([]);
+      setCustomCategory("");
 
       toast.success('Product added successfully!');
     } catch (error) {
@@ -220,14 +234,33 @@ const AddProductsSection: FC = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Product Category
             </label>
-            <input
-              type="text"
+            <select
               name="category"
               value={formData.category}
               onChange={handleInputChange}
-              placeholder="Enter product category"
-              className="border border-gray-300 p-3 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+              className="border border-gray-300 p-3 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+            >
+              <option value="">Select a category</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+              <option value="custom">+ Add Custom Category</option>
+            </select>
+            {formData.category === "custom" && (
+              <input
+                type="text"
+                placeholder="Enter custom category name"
+                value={customCategory}
+                onChange={(e) => {
+                  setCustomCategory(e.target.value);
+                  setFormData({ ...formData, category: e.target.value });
+                }}
+                className="border border-gray-300 p-3 rounded-lg w-full mt-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                autoFocus
+              />
+            )}
           </div>
 
           <div>
