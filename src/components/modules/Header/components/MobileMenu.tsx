@@ -25,7 +25,8 @@ const MobileMenu: FC<MobileMenuProps> = ({ isAuthenticated = false, currentUser,
       {isOpen && (
         <div className="absolute top-[60px] left-0 w-full bg-white shadow-lg p-5 flex flex-col gap-4 md:hidden z-50 text-base sm:text-lg">
           <NavLinks
-            listClassName="flex flex-col gap-4"
+            listClassName="flex flex-col gap-2"
+            linkClassName="text-gray-900 block"
             onLinkClick={toggleMenu}
           />
           <ActionIcons

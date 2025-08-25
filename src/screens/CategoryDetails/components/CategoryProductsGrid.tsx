@@ -50,35 +50,36 @@ const CategoryProductsGrid: FC<CategoryProductsGridProps> = ({
   }
 
   return (
-    <div className="w-full p-5">
-      <div className="w-full flex flex-wrap">
-        <div className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4 justify-start">
+    <div className="w-full p-6">
+      <div className="w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {products.map((product) => (
             <div
               key={product.id}
-              className="relative bg-white rounded-2xl shadow-md p-3 transition hover:shadow-lg h-72 flex flex-col justify-between cursor-pointer group"
+              className="relative bg-white rounded-2xl shadow-md p-4 transition hover:shadow-lg h-auto flex flex-col justify-between cursor-pointer group max-w-sm mx-auto w-full"
               onClick={() => onProductClick(product.id)}
             >
               {/* Header with title, price and action buttons */}
-              <div className="flex justify-between items-start">
-                <div className="flex-1 pr-1 overflow-hidden">
+              <div className="flex justify-between items-start mb-3">
+                <div className="flex-1 pr-2 overflow-hidden">
                   <h3 
-                    className="text-md font-medium text-gray-900 group-hover:text-gray-700 transition-colors"
+                    className="text-lg font-medium text-gray-900 group-hover:text-gray-700 transition-colors mb-2"
                     style={{
                       display: '-webkit-box',
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
-                      textOverflow: 'ellipsis'
+                      textOverflow: 'ellipsis',
+                      minHeight: '2.5rem'
                     }}
                   >
                     {product.title}
                   </h3>
-                  <p className="text-sm font-semibold text-gray-700 mt-1">
+                  <p className="text-base font-semibold text-gray-700 mb-2">
                     {formatPrice(product.price)}
                   </p>
                   {product.rating && (
-                    <div className="flex items-center gap-1 mt-1">
+                    <div className="flex items-center gap-1">
                       <span className="text-yellow-500 text-sm">★</span>
                       <span className="text-sm text-gray-600">{product.rating}</span>
                       {product.reviews && (
@@ -90,32 +91,32 @@ const CategoryProductsGrid: FC<CategoryProductsGridProps> = ({
                 
                 {/* Action buttons */}
                 <div 
-                  className="flex space-x-1"
+                  className="flex flex-col space-y-2"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
                     onClick={() => onAddToWishlist(product.id)}
-                    className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
                     title="Add to Wishlist"
                   >
-                    <Heart className="w-4 h-4 text-gray-600" />
+                    <Heart className="w-5 h-5 text-gray-600" />
                   </button>
                   <button
                     onClick={() => onAddToCart(product.id)}
-                    className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
                     title="Add to Cart"
                   >
-                    <ShoppingBag className="w-4 h-4 text-gray-600" />
+                    <ShoppingBag className="w-5 h-5 text-gray-600" />
                   </button>
                 </div>
               </div>
               
               {/* Product image */}
-              <div className="mt-3">
+              <div className="mt-auto">
                 <img 
                   src={product.image} 
                   alt={product.title} 
-                  className="w-full h-44 object-cover rounded-xl" 
+                  className="w-full h-48 object-cover rounded-xl" 
                 />
               </div>
             </div>
