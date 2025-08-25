@@ -61,8 +61,17 @@ const CategoryProductsGrid: FC<CategoryProductsGridProps> = ({
             >
               {/* Header with title, price and action buttons */}
               <div className="flex justify-between items-start">
-                <div className="flex-1 pr-1">
-                  <h3 className="text-md font-medium text-gray-900 line-clamp-2 group-hover:text-gray-700 transition-colors">
+                <div className="flex-1 pr-1 overflow-hidden">
+                  <h3 
+                    className="text-md font-medium text-gray-900 group-hover:text-gray-700 transition-colors"
+                    style={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}
+                  >
                     {product.title}
                   </h3>
                   <p className="text-sm font-semibold text-gray-700 mt-1">

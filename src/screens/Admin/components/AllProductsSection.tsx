@@ -113,11 +113,20 @@ const AllProductsSection: FC = () => {
         {filteredProducts.map((product) => (
           <div
             key={product.id}
-            className="bg-white rounded-xl shadow p-3 flex flex-col justify-between max-w-xs"
+            className="bg-white rounded-xl shadow p-3 flex flex-col justify-between max-w-xs h-64 overflow-hidden"
           >
             <div>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-md font-semibold text-gray-800 truncate">
+                <span 
+                  className="text-md font-semibold text-gray-800 flex-1 mr-2"
+                  style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 1,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                >
                   {product.title}
                 </span>
                 <div className="flex gap-1">
@@ -144,10 +153,20 @@ const AllProductsSection: FC = () => {
               alt={product.title}
               className="w-full h-28 object-contain rounded-lg bg-gray-100 mt-2"
             />
-            <div className="mt-2">
-              <p className="text-sm text-gray-500 line-clamp-2">{product.description}</p>
+            <div className="mt-2 flex-1 overflow-hidden">
+              <p 
+                className="text-xs text-gray-500 overflow-hidden"
+                style={{
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  textOverflow: 'ellipsis'
+                }}
+              >
+                {product.description}
+              </p>
               <div className="flex justify-between items-center mt-1">
-                <span className="text-sm text-gray-500">{product.category}</span>
+                <span className="text-sm text-gray-500 truncate">{product.category}</span>
                 <span className="text-sm text-yellow-600">★ {product.rating}</span>
               </div>
             </div>

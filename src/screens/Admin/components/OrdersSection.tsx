@@ -1,5 +1,5 @@
 import { useState, type FC } from "react";
-import { toast } from "../../../components/ui";
+import { toast, ConfirmationModal } from "../../../components/ui";
 
 interface Order {
   id: string;
@@ -30,13 +30,15 @@ const OrdersSection: FC = () => {
 
   // Handle status change
   const handleStatusChange = (orderId: string, newStatus: Order['status']) => {
-    // Show confirmation for critical status changes
-    if (newStatus === 'Cancelled' || newStatus === 'Delivered') {
-      const confirmMessage = newStatus === 'Cancelled' 
-        ? 'Are you sure you want to cancel this order?' 
-        : 'Are you sure this order has been delivered?';
-      
-      if (!window.confirm(confirmMessage)) {
+    // Show toast confirmation for critical status changes
+    if (newStatus === 'Cancelled') {
+      if (!confirm('Are you sure you want to cancel this order?')) {
+        return;
+      }
+    }
+    
+    if (newStatus === 'Delivered') {
+      if (!confirm('Are you sure this order has been delivered?')) {
         return;
       }
     }

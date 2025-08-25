@@ -27,12 +27,24 @@ const ProductDetailsScreen = () => {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isInWishlist, setIsInWishlist] = useState(false);
 
   useEffect(() => {
     if (id) {
       loadProduct(id);
+      checkWishlistStatus(id);
     }
   }, [id]);
+
+  const checkWishlistStatus = (productId: string) => {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    if (currentUser) {
+      const userEmail = currentUser.email;
+      const userWishlist = JSON.parse(localStorage.getItem(`wishlist_${userEmail}`) || '[]');
+      const isProductInWishlist = userWishlist.some((item: Product) => item.id === productId);
+      setIsInWishlist(isProductInWishlist);
+    }
+  };
 
   const loadProduct = (productId: string) => {
     try {
@@ -80,7 +92,7 @@ const ProductDetailsScreen = () => {
     }
   };
 
-  const handleAddToWishlist = (productId: string) => {
+  const handleToggleWishlist = (productId: string) => {
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
     
     if (!currentUser) {
@@ -89,18 +101,24 @@ const ProductDetailsScreen = () => {
     }
 
     const products: Product[] = JSON.parse(localStorage.getItem('products') || '[]');
-    const productToAdd = products.find((p) => p.id === productId);
+    const productToToggle = products.find((p) => p.id === productId);
 
-    if (productToAdd) {
+    if (productToToggle) {
       const userEmail = currentUser.email;
       let userWishlist = JSON.parse(localStorage.getItem(`wishlist_${userEmail}`) || '[]');
-      const existingItem = userWishlist.find((item: Product) => item.id === productId);
+      const existingItemIndex = userWishlist.findIndex((item: Product) => item.id === productId);
 
-      if (existingItem) {
-        toast.warning('Product is already in your wishlist!');
-      } else {
-        userWishlist.push(productToAdd);
+      if (existingItemIndex > -1) {
+        // Remove from wishlist
+        userWishlist.splice(existingItemIndex, 1);
         localStorage.setItem(`wishlist_${userEmail}`, JSON.stringify(userWishlist));
+        setIsInWishlist(false);
+        toast.success('Product removed from wishlist!');
+      } else {
+        // Add to wishlist
+        userWishlist.push(productToToggle);
+        localStorage.setItem(`wishlist_${userEmail}`, JSON.stringify(userWishlist));
+        setIsInWishlist(true);
         toast.success('Product added to wishlist!');
       }
     }
@@ -206,7 +224,8 @@ const ProductDetailsScreen = () => {
               <ProductInfo 
                 product={product}
                 onAddToCart={handleAddToCart}
-                onAddToWishlist={handleAddToWishlist}
+                onToggleWishlist={handleToggleWishlist}
+                isInWishlist={isInWishlist}
               />
               
               {/* Accordion Sections */}

@@ -12,6 +12,7 @@ const ProductsScreen = () => {
   const [searchValue, setSearchValue] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [wishlistItems, setWishlistItems] = useState<string[]>([]);
 
   // Sample products data - Replace with your actual data source
   const sampleProducts: Product[] = [
@@ -50,7 +51,21 @@ const ProductsScreen = () => {
       setFilteredProducts(sampleProducts);
       localStorage.setItem('products', JSON.stringify(sampleProducts));
     }
+    
+    // Load wishlist items
+    loadWishlistItems();
   }, []);
+
+  const loadWishlistItems = () => {
+    const currentUser = localStorage.getItem('currentUser');
+    if (currentUser) {
+      const user = JSON.parse(currentUser);
+      const userEmail = user.email;
+      const userWishlist = JSON.parse(localStorage.getItem(`wishlist_${userEmail}`) || '[]');
+      const wishlistIds = userWishlist.map((item: Product) => item.id);
+      setWishlistItems(wishlistIds);
+    }
+  };
 
   // Filter products whenever search or price filters change
   useEffect(() => {
@@ -110,11 +125,11 @@ const ProductsScreen = () => {
     }
   };
 
-  const handleAddToWishlist = (productId: string) => {
+  const handleToggleWishlist = (productId: string) => {
     // Check if user is logged in
     const currentUser = localStorage.getItem('currentUser');
     if (!currentUser) {
-      navigate('/login');
+      navigate('/auth/login');
       return;
     }
 
@@ -125,13 +140,19 @@ const ProductsScreen = () => {
 
       // Get user-specific wishlist
       let userWishlist = JSON.parse(localStorage.getItem(`wishlist_${userEmail}`) || '[]');
-      const existingItem = userWishlist.find((item: Product) => item.id === productId);
+      const existingItemIndex = userWishlist.findIndex((item: Product) => item.id === productId);
 
-      if (existingItem) {
-        toast.warning('Product is already in your wishlist!');
+      if (existingItemIndex > -1) {
+        // Remove from wishlist
+        userWishlist.splice(existingItemIndex, 1);
+        localStorage.setItem(`wishlist_${userEmail}`, JSON.stringify(userWishlist));
+        setWishlistItems(prev => prev.filter(id => id !== productId));
+        toast.success('Product removed from wishlist!');
       } else {
+        // Add to wishlist
         userWishlist.push(product);
         localStorage.setItem(`wishlist_${userEmail}`, JSON.stringify(userWishlist));
+        setWishlistItems(prev => [...prev, productId]);
         toast.success('Product added to wishlist!');
       }
     }
@@ -164,8 +185,9 @@ const ProductsScreen = () => {
       <ProductGrid
         products={filteredProducts}
         onAddToCart={handleAddToCart}
-        onAddToWishlist={handleAddToWishlist}
+        onToggleWishlist={handleToggleWishlist}
         onProductClick={handleProductClick}
+        wishlistItems={wishlistItems}
       />
     </RootLayout>
   );

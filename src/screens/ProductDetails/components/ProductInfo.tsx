@@ -18,13 +18,15 @@ interface Product {
 interface ProductInfoProps {
   product: Product;
   onAddToCart: (productId: string) => void;
-  onAddToWishlist: (productId: string) => void;
+  onToggleWishlist: (productId: string) => void;
+  isInWishlist?: boolean;
 }
 
 const ProductInfo: FC<ProductInfoProps> = ({ 
   product, 
   onAddToCart, 
-  onAddToWishlist 
+  onToggleWishlist,
+  isInWishlist = false
 }) => {
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedFit, setSelectedFit] = useState("Regular");
@@ -55,12 +57,12 @@ const ProductInfo: FC<ProductInfoProps> = ({
     onAddToCart(product.id);
   };
 
-  const handleAddToWishlist = () => {
+  const handleToggleWishlist = () => {
     if (!currentUser) {
       toast.warning('Please login to add items to wishlist');
       return;
     }
-    onAddToWishlist(product.id);
+    onToggleWishlist(product.id);
   };
 
   return (
@@ -158,11 +160,19 @@ const ProductInfo: FC<ProductInfoProps> = ({
         </button>
         
         <button
-          onClick={handleAddToWishlist}
-          className="w-full border border-gray-300 text-gray-900 py-4 rounded-full font-medium hover:border-gray-400 transition-colors flex items-center justify-center gap-2"
+          onClick={handleToggleWishlist}
+          className={`w-full border py-4 rounded-full font-medium transition-colors flex items-center justify-center gap-2 ${
+            isInWishlist 
+              ? 'border-red-300 bg-red-50 text-red-700 hover:border-red-400' 
+              : 'border-gray-300 text-gray-900 hover:border-gray-400'
+          }`}
         >
-          <Heart className="w-5 h-5" />
-          Favorite
+          <Heart 
+            className={`w-5 h-5 ${
+              isInWishlist ? 'fill-current text-red-500' : ''
+            }`} 
+          />
+          {isInWishlist ? 'Remove from Favorites' : 'Add to Favorites'}
         </button>
       </div>
 

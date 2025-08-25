@@ -68,19 +68,19 @@ const OrdersScreen = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen p-6 bg-gray-50">
       <Header />
       
       <div className="container mx-auto px-4 py-8">
         {/* Orders Header */}
         <div className="w-full mb-8 px-4 md:px-10 pt-16">
-          <div className="flex items-center justify-end gap-3 mb-4">
+          <div className="flex items-center justify-start gap-3 mb-4">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-light text-gray-900">My Orders</h1>
             <div className="rounded-full w-6 sm:w-8 h-6 sm:h-8 border border-gray-800 flex justify-center items-center">
               <div className="w-4 sm:w-6 h-4 sm:h-6 rounded-full bg-gray-800"></div>
             </div>
           </div>
-          <p className="text-gray-600 text-sm md:text-base text-right">Track and manage your orders</p>
+          <p className="text-gray-600 text-sm md:text-base">Track and manage your orders</p>
         </div>
 
         {/* Orders List */}

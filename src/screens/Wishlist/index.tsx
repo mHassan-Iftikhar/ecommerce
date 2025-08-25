@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, ShoppingCart, X, Package, Star } from 'lucide-react';
+import { ShoppingCart, X, Star } from 'lucide-react';
 import { Header, Footer } from '../../components';
-import { toast } from '../../components/ui';
+import { toast, ConfirmationModal } from '../../components/ui';
+import { EmptyWishlist } from './components';
 
 interface Product {
   id: number;
@@ -16,6 +17,7 @@ interface Product {
 
 const Wishlist: React.FC = () => {
   const [wishlistItems, setWishlistItems] = useState<Product[]>([]);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   useEffect(() => {
     loadWishlist();
@@ -126,19 +128,22 @@ const Wishlist: React.FC = () => {
   };
 
   const clearWishlist = () => {
-    if (window.confirm('Are you sure you want to clear your entire wishlist?')) {
-      try {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-        if (currentUser.email) {
-          localStorage.removeItem(`wishlist_${currentUser.email}`);
-          setWishlistItems([]);
-          toast.success('Wishlist cleared');
-        }
-      } catch (error) {
-        console.error('Error clearing wishlist:', error);
-        toast.error('Failed to clear wishlist');
+    setShowClearConfirm(true);
+  };
+
+  const handleClearConfirm = () => {
+    try {
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      if (currentUser.email) {
+        localStorage.removeItem(`wishlist_${currentUser.email}`);
+        setWishlistItems([]);
+        toast.success('Wishlist cleared');
       }
+    } catch (error) {
+      console.error('Error clearing wishlist:', error);
+      toast.error('Failed to clear wishlist');
     }
+    setShowClearConfirm(false);
   };
 
   if (wishlistItems.length === 0) {
@@ -165,7 +170,7 @@ const Wishlist: React.FC = () => {
 
             {/* Header */}
             <div className="w-full mb-6 px-10 pt-20">
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center justify-start gap-2 mb-4">
                 <div className="rounded-full w-6 sm:w-8 h-6 sm:h-8 border border-black flex justify-center items-center">
                   <div className="w-4 sm:w-6 h-4 sm:h-6 rounded-full bg-black"></div>
                 </div>
@@ -175,20 +180,7 @@ const Wishlist: React.FC = () => {
             </div>
 
             {/* Empty State */}
-            <div className="text-center p-12">
-              <Heart className="w-24 h-24 text-gray-300 mx-auto mb-6" />
-              <h2 className="text-2xl font-semibold text-gray-900 mb-3">Your wishlist is empty</h2>
-              <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                Save items you love to your wishlist for easy access later. Browse our collection to find your favorites!
-              </p>
-              <Link
-                to="/products"
-                className="inline-flex items-center gap-2 bg-gray-900 text-white px-8 py-3 rounded-lg font-semibold hover:bg-black transition-colors"
-              >
-                <Package className="w-5 h-5" />
-                Start Shopping
-              </Link>
-            </div>
+            <EmptyWishlist />
           </div>
         </div>
         
@@ -219,10 +211,9 @@ const Wishlist: React.FC = () => {
           </div>
 
           {/* Header */}
-          {/* Header */}
           <div className="w-full mb-6 px-10 pt-20">
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-start gap-2">
                 <div className="rounded-full w-6 sm:w-8 h-6 sm:h-8 border border-black flex justify-center items-center">
                   <div className="w-4 sm:w-6 h-4 sm:h-6 rounded-full bg-black"></div>
                 </div>
@@ -340,6 +331,18 @@ const Wishlist: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showClearConfirm}
+        title="Clear Wishlist"
+        message="Are you sure you want to clear your entire wishlist? This action cannot be undone."
+        confirmText="Clear Wishlist"
+        cancelText="Cancel"
+        type="danger"
+        onConfirm={handleClearConfirm}
+        onCancel={() => setShowClearConfirm(false)}
+      />
       
       <Footer />
     </div>

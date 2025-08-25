@@ -16,15 +16,17 @@ export interface Product {
 interface ProductCardProps {
   product: Product;
   onAddToCart: (productId: string) => void;
-  onAddToWishlist: (productId: string) => void;
+  onToggleWishlist: (productId: string) => void;
   onProductClick: (productId: string) => void;
+  isInWishlist?: boolean;
 }
 
 const ProductCard: FC<ProductCardProps> = ({
   product,
   onAddToCart,
-  onAddToWishlist,
-  onProductClick
+  onToggleWishlist,
+  onProductClick,
+  isInWishlist = false
 }) => {
   const handleCardClick = () => {
     onProductClick(product.id);
@@ -37,7 +39,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
   const handleAddToWishlist = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onAddToWishlist(product.id);
+    onToggleWishlist(product.id);
   };
 
   return (
@@ -47,17 +49,38 @@ const ProductCard: FC<ProductCardProps> = ({
     >
       {/* Top section: title, price, icons */}
       <div className="flex justify-between items-start">
-        <div>
-          <h3 className="text-base font-medium text-gray-900">{product.title}</h3>
+        <div className="flex-1 mr-2">
+          <h3 
+            className="text-base font-medium text-gray-900"
+            style={{
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}
+          >
+            {product.title}
+          </h3>
           <p className="text-sm font-semibold text-gray-700">${product.price}</p>
         </div>
         <div className="flex space-x-2">
           {/* Wishlist icon */}
           <button
             onClick={handleAddToWishlist}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+            className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors ${
+              isInWishlist 
+                ? 'bg-red-100 hover:bg-red-200' 
+                : 'bg-gray-100 hover:bg-gray-200'
+            }`}
           >
-            <Heart className="w-4 h-4 text-gray-600" />
+            <Heart 
+              className={`w-4 h-4 ${
+                isInWishlist 
+                  ? 'text-red-500 fill-current' 
+                  : 'text-gray-600'
+              }`} 
+            />
           </button>
           {/* Cart icon */}
           <button

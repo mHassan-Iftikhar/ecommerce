@@ -23,11 +23,23 @@ const ProductsSection: FC<ProductsSectionProps> = ({
   className = "p-5"
 }) => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [wishlistItems, setWishlistItems] = useState<string[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     loadRandomProducts();
+    loadWishlistItems();
   }, []);
+
+  const loadWishlistItems = () => {
+    const currentUser = AuthManager.getCurrentUser();
+    if (currentUser) {
+      const userEmail = currentUser.email;
+      const userWishlist = JSON.parse(localStorage.getItem(`wishlist_${userEmail}`) || '[]');
+      const wishlistIds = userWishlist.map((item: Product) => item.id);
+      setWishlistItems(wishlistIds);
+    }
+  };
 
   const loadRandomProducts = () => {
     try {
@@ -146,7 +158,7 @@ const ProductsSection: FC<ProductsSectionProps> = ({
     }
   };
 
-  const handleAddToWishlist = (productId: string) => {
+  const handleToggleWishlist = (productId: string) => {
     const currentUser = AuthManager.getCurrentUser();
     if (!currentUser) {
       navigate('/auth/login');
@@ -157,14 +169,20 @@ const ProductsSection: FC<ProductsSectionProps> = ({
     if (product) {
       const userEmail = currentUser.email;
       let userWishlist = JSON.parse(localStorage.getItem(`wishlist_${userEmail}`) || '[]');
-      const existingItem = userWishlist.find((item: any) => item.id === productId);
+      const existingItemIndex = userWishlist.findIndex((item: any) => item.id === productId);
 
-      if (!existingItem) {
+      if (existingItemIndex > -1) {
+        // Remove from wishlist
+        userWishlist.splice(existingItemIndex, 1);
+        localStorage.setItem(`wishlist_${userEmail}`, JSON.stringify(userWishlist));
+        setWishlistItems(prev => prev.filter(id => id !== productId));
+        toast.success('Product removed from wishlist!');
+      } else {
+        // Add to wishlist
         userWishlist.push(product);
         localStorage.setItem(`wishlist_${userEmail}`, JSON.stringify(userWishlist));
+        setWishlistItems(prev => [...prev, productId]);
         toast.success('Product added to wishlist!');
-      } else {
-        toast.info('Product already in wishlist!');
       }
     }
   };
@@ -186,8 +204,19 @@ const ProductsSection: FC<ProductsSectionProps> = ({
           >
             {/* Top section: title, price, icons */}
             <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-base font-medium text-gray-900">{product.title}</h3>
+              <div className="flex-1 mr-2 overflow-hidden">
+                <h3 
+                  className="text-base font-medium text-gray-900"
+                  style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                >
+                  {product.title}
+                </h3>
                 <p className="text-sm font-semibold text-gray-700">${product.price}</p>
               </div>
               <div className="flex space-x-2">
@@ -195,11 +224,21 @@ const ProductsSection: FC<ProductsSectionProps> = ({
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleAddToWishlist(product.id);
+                    handleToggleWishlist(product.id);
                   }}
-                  className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                  className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors ${
+                    wishlistItems.includes(product.id) 
+                      ? 'bg-red-100 hover:bg-red-200' 
+                      : 'bg-gray-100 hover:bg-gray-200'
+                  }`}
                 >
-                  <Heart className="w-4 h-4 text-gray-600" />
+                  <Heart 
+                    className={`w-4 h-4 ${
+                      wishlistItems.includes(product.id) 
+                        ? 'text-red-500 fill-current' 
+                        : 'text-gray-600'
+                    }`} 
+                  />
                 </button>
                 {/* Cart icon */}
                 <button

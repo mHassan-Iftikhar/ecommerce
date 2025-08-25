@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Plus, Minus, Trash2, ShoppingCart, Package } from "lucide-react";
+import { ArrowLeft, Plus, Minus, Trash2, ShoppingCart, Package, ChevronDown, ChevronUp } from "lucide-react";
 import { Header, Footer } from "../../components";
 import { toast } from "../../components/ui";
 import { AuthManager } from "../../utils/AuthManager";
@@ -18,6 +18,7 @@ interface CartItem {
 const Cart = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedDescriptions, setExpandedDescriptions] = useState<{[key: string]: boolean}>({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -79,6 +80,13 @@ const Cart = () => {
     return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
+  const toggleDescription = (itemId: string) => {
+    setExpandedDescriptions(prev => ({
+      ...prev,
+      [itemId]: !prev[itemId]
+    }));
+  };
+
   const handlePlaceOrder = () => {
     if (cartItems.length === 0) {
       toast.warning('Your cart is empty!');
@@ -132,7 +140,12 @@ const Cart = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Shopping
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Your Shopping Cart</h1>
+          <div className="flex items-center gap-3">
+            <div className="rounded-full w-6 sm:w-8 h-6 sm:h-8 border border-black flex justify-center items-center">
+              <div className="w-4 sm:w-6 h-4 sm:h-6 rounded-full bg-black"></div>
+            </div>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-light text-gray-900">My Cart</h1>
+          </div>
         </div>
 
         {cartItems.length === 0 ? (
@@ -163,16 +176,63 @@ const Cart = () => {
                     <img 
                       src={item.image} 
                       alt={item.title}
-                      className="w-24 h-24 object-cover rounded-lg bg-gray-100"
+                      className="w-24 h-24 object-cover rounded-lg bg-gray-100 flex-shrink-0"
                     />
                     
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <h3 
+                        className="text-lg font-semibold text-gray-900 mb-2"
+                        style={{
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}
+                      >
                         {item.title}
                       </h3>
-                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                        {item.description}
-                      </p>
+                      
+                      {/* Description with Accordion */}
+                      {item.description && (
+                        <div className="mb-3">
+                          <div 
+                            className={`text-gray-600 text-sm transition-all duration-200 ${
+                              expandedDescriptions[item.id] ? '' : 'line-clamp-2'
+                            }`}
+                            style={
+                              !expandedDescriptions[item.id] ? {
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                              } : {}
+                            }
+                          >
+                            {item.description}
+                          </div>
+                          {item.description.length > 100 && (
+                            <button
+                              onClick={() => toggleDescription(item.id)}
+                              className="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm mt-1 transition-colors"
+                            >
+                              {expandedDescriptions[item.id] ? (
+                                <>
+                                  Show less
+                                  <ChevronUp className="w-4 h-4" />
+                                </>
+                              ) : (
+                                <>
+                                  Show more
+                                  <ChevronDown className="w-4 h-4" />
+                                </>
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      )}
+                      
                       <p className="text-lg font-semibold text-gray-900 mb-3">
                         ${item.price.toFixed(2)}
                       </p>
@@ -198,7 +258,7 @@ const Cart = () => {
                       </div>
                     </div>
                     
-                    <div className="text-right">
+                    <div className="text-right flex-shrink-0">
                       <p className="text-xl font-bold text-gray-900 mb-4">
                         ${(item.price * item.quantity).toFixed(2)}
                       </p>

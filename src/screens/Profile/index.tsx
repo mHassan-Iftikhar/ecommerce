@@ -134,15 +134,15 @@ const ProfileScreen = () => {
       <Header />
       
       <div className="container mx-auto px-4 py-8">
-        {/* Profile Header - Right Aligned */}
+        {/* Profile Header - Left Aligned */}
         <div className="w-full mb-8 px-4 md:px-10 pt-16">
-          <div className="flex items-center justify-end gap-3 mb-4">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-light text-gray-900">My Profile</h1>
+          <div className="flex items-center justify-start gap-3 mb-4">
             <div className="rounded-full w-6 sm:w-8 h-6 sm:h-8 border border-gray-800 flex justify-center items-center">
               <div className="w-4 sm:w-6 h-4 sm:h-6 rounded-full bg-gray-800"></div>
             </div>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-light text-gray-900">My Profile</h1>
           </div>
-          <p className="text-gray-600 text-sm md:text-base text-right">Manage your account information and preferences</p>
+          <p className="text-gray-600 text-sm md:text-base">Manage your account information and preferences</p>
         </div>
 
         {/* Profile Card */}
