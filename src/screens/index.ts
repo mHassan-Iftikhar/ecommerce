@@ -10,5 +10,7 @@ export { default as CartScreen } from "./Cart";
 export { default as CheckoutScreen } from "./Checkout";
 export { default as OrderConfirmationScreen } from "./OrderConfirmation";
 export { default as OrderTrackingScreen } from "./OrderTracking";
+export { default as OrdersScreen } from "./Orders";
 export { default as WishlistScreen } from "./Wishlist";
+export { default as ProfileScreen } from "./Profile";
 export { LoginScreen, SignupScreen } from "./Auth";

@@ -14,7 +14,7 @@ const ProductGrid: FC<ProductGridProps> = ({
   onAddToCart,
   onAddToWishlist,
   onProductClick,
-  className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-5 max-w-6xl mx-auto"
+  className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 p-5 max-w-full mx-auto"
 }) => {
   if (products.length === 0) {
     return (

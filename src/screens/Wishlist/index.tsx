@@ -143,7 +143,7 @@ const Wishlist: React.FC = () => {
 
   if (wishlistItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="min-h-screen p-6 bg-gray-50 flex flex-col">
         <Header />
         
         <div className="flex-1 py-8">
@@ -164,12 +164,14 @@ const Wishlist: React.FC = () => {
             </div>
 
             {/* Header */}
-            <div className="text-center mb-8">
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <Heart className="w-10 h-10 text-red-500" />
-                <h1 className="text-4xl font-bold text-gray-900">My Wishlist</h1>
+            <div className="w-full mb-6 px-10 pt-20">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="rounded-full w-6 sm:w-8 h-6 sm:h-8 border border-black flex justify-center items-center">
+                  <div className="w-4 sm:w-6 h-4 sm:h-6 rounded-full bg-black"></div>
+                </div>
+                <h1 className="text-2xl sm:text-3xl md:text-5xl font-light">My Wishlist</h1>
               </div>
-              <p className="text-gray-600 text-lg">You have 0 items in your wishlist</p>
+              <p className="text-gray-600">You have 0 items in your wishlist</p>
             </div>
 
             {/* Empty State */}
@@ -196,11 +198,11 @@ const Wishlist: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen p-6 bg-gray-50 flex flex-col">
       <Header />
       
       <div className="flex-1 py-8">
-        <div className="max-w-6xl mx-auto px-4">
+        <div className="max-w-full mx-auto px-4">
           {/* Breadcrumb */}
           <div className="mb-6">
             <nav className="flex" aria-label="Breadcrumb">
@@ -217,22 +219,25 @@ const Wishlist: React.FC = () => {
           </div>
 
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-3">
-              <Heart className="w-10 h-10 text-red-500" />
-              <div>
-                <h1 className="text-4xl font-bold text-gray-900">My Wishlist</h1>
-                <p className="text-gray-600 text-lg">
-                  You have {wishlistItems.length} item{wishlistItems.length !== 1 ? 's' : ''} in your wishlist
-                </p>
+          {/* Header */}
+          <div className="w-full mb-6 px-10 pt-20">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="rounded-full w-6 sm:w-8 h-6 sm:h-8 border border-black flex justify-center items-center">
+                  <div className="w-4 sm:w-6 h-4 sm:h-6 rounded-full bg-black"></div>
+                </div>
+                <h1 className="text-2xl sm:text-3xl md:text-5xl font-light">My Wishlist</h1>
               </div>
+              <Link
+                to="/products"
+                className="hidden md:block bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-black transition-colors"
+              >
+                Continue Shopping
+              </Link>
             </div>
-            <Link
-              to="/products"
-              className="hidden md:block bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-black transition-colors"
-            >
-              Continue Shopping
-            </Link>
+            <p className="text-gray-600">
+              You have {wishlistItems.length} item{wishlistItems.length !== 1 ? 's' : ''} in your wishlist
+            </p>
           </div>
 
           {/* Quick Actions */}
@@ -240,7 +245,7 @@ const Wishlist: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={addAllToCart}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                className="bg-transparent border-1 border-black text-black px-6 py-3 rounded-lg font-semibold hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
               >
                 <ShoppingCart className="w-5 h-5" />
                 Add All to Cart ({wishlistItems.filter(item => item.inStock).length} items)
@@ -257,7 +262,7 @@ const Wishlist: React.FC = () => {
           </div>
 
           {/* Wishlist Items Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
             {wishlistItems.map((product) => (
               <div 
                 key={product.id}

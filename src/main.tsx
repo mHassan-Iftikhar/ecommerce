@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 import App from "./App.tsx";
-import { HomeScreen, ProductsScreen, ProductDetailsScreen, CategoriesScreen, CategoryDetailsScreen, ContactScreen, AdminScreen, LoginScreen, SignupScreen, ErrorScreen, CartScreen, CheckoutScreen, OrderConfirmationScreen, OrderTrackingScreen, WishlistScreen } from "./screens";
+import { HomeScreen, ProductsScreen, ProductDetailsScreen, CategoriesScreen, CategoryDetailsScreen, ContactScreen, AdminScreen, LoginScreen, SignupScreen, ErrorScreen, CartScreen, CheckoutScreen, OrderConfirmationScreen, OrderTrackingScreen, OrdersScreen, WishlistScreen, ProfileScreen } from "./screens";
 
 const router = createBrowserRouter([
   {
@@ -52,8 +52,16 @@ const router = createBrowserRouter([
         element: <OrderTrackingScreen />,
       },
       {
+        path: "/orders",
+        element: <OrdersScreen />,
+      },
+      {
         path: "/wishlist",
         element: <WishlistScreen />,
+      },
+      {
+        path: "/profile",
+        element: <ProfileScreen />,
       },
       {
         path: "/auth/login",

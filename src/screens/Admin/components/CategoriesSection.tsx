@@ -1,5 +1,5 @@
 import { useState, useEffect, type FC } from "react";
-import { Search, Trash2 } from "lucide-react";
+import { Search, Trash2, Edit3 } from "lucide-react";
 import { toast } from "../../../components/ui";
 
 interface Product {
@@ -22,6 +22,9 @@ const CategoriesSection: FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [categoryToEdit, setCategoryToEdit] = useState<string | null>(null);
+  const [newCategoryName, setNewCategoryName] = useState("");
 
   useEffect(() => {
     loadCategories();
@@ -96,6 +99,56 @@ const CategoriesSection: FC = () => {
     setCategoryToDelete(null);
   };
 
+  const handleEditCategory = (categoryName: string) => {
+    setCategoryToEdit(categoryName);
+    setNewCategoryName(categoryName);
+    setShowEditModal(true);
+  };
+
+  const saveEditCategory = () => {
+    if (!categoryToEdit || !newCategoryName.trim()) {
+      toast.error('Please enter a valid category name');
+      return;
+    }
+
+    if (newCategoryName.trim() === categoryToEdit) {
+      // No change, just close modal
+      cancelEdit();
+      return;
+    }
+
+    try {
+      // Get all products
+      const products: Product[] = JSON.parse(localStorage.getItem('products') || '[]');
+      
+      // Update category name for all products in this category
+      const updatedProducts = products.map(product => 
+        product.category?.trim() === categoryToEdit 
+          ? { ...product, category: newCategoryName.trim() }
+          : product
+      );
+      
+      // Update localStorage
+      localStorage.setItem('products', JSON.stringify(updatedProducts));
+      
+      // Reload categories
+      loadCategories();
+      
+      toast.success(`Category renamed from "${categoryToEdit}" to "${newCategoryName.trim()}"`);
+    } catch (error) {
+      console.error('Error editing category:', error);
+      toast.error('Error editing category');
+    } finally {
+      cancelEdit();
+    }
+  };
+
+  const cancelEdit = () => {
+    setShowEditModal(false);
+    setCategoryToEdit(null);
+    setNewCategoryName("");
+  };
+
   return (
     <div className="p-4 md:p-8">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
@@ -126,13 +179,22 @@ const CategoriesSection: FC = () => {
                     {category.products.length} product{category.products.length !== 1 ? 's' : ''}
                   </p>
                 </div>
-                <button
-                  onClick={() => handleDeleteCategory(category.name)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  title="Delete Category"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => handleEditCategory(category.name)}
+                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    title="Edit Category"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteCategory(category.name)}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Delete Category"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
               
               {/* Sample products preview */}
@@ -186,6 +248,46 @@ const CategoriesSection: FC = () => {
                 className="flex-1 px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
               >
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Category Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">
+              Edit Category
+            </h3>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Category Name
+              </label>
+              <input
+                type="text"
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter new category name"
+              />
+            </div>
+            <p className="text-sm text-gray-600 mb-6">
+              This will rename the category for all products currently in "{categoryToEdit}".
+            </p>
+            <div className="flex space-x-3">
+              <button
+                onClick={cancelEdit}
+                className="flex-1 px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveEditCategory}
+                className="flex-1 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Save Changes
               </button>
             </div>
           </div>

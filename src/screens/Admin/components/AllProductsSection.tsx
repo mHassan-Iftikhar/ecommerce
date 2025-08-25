@@ -1,5 +1,5 @@
 import { useState, type FC } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, Edit3 } from "lucide-react";
 import { toast } from "../../../components/ui";
 
 interface Product {
@@ -19,6 +19,17 @@ const AllProductsSection: FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [productToEdit, setProductToEdit] = useState<Product | null>(null);
+  const [editFormData, setEditFormData] = useState<Product>({
+    id: '',
+    title: '',
+    price: 0,
+    image: '',
+    description: '',
+    rating: 0,
+    category: ''
+  });
 
   const filteredProducts = products.filter(product =>
     product.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -27,6 +38,42 @@ const AllProductsSection: FC = () => {
   const handleDeleteProduct = (productId: string) => {
     setProductToDelete(productId);
     setShowDeleteModal(true);
+  };
+
+  const handleEditProduct = (product: Product) => {
+    setProductToEdit(product);
+    setEditFormData(product);
+    setShowEditModal(true);
+  };
+
+  const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setEditFormData(prev => ({
+      ...prev,
+      [name]: name === 'price' || name === 'rating' ? Number(value) : value
+    }));
+  };
+
+  const saveEditProduct = () => {
+    if (!editFormData.title || !editFormData.price || !editFormData.category) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    const updatedProducts = products.map(product => 
+      product.id === editFormData.id ? editFormData : product
+    );
+    setProducts(updatedProducts);
+    localStorage.setItem('products', JSON.stringify(updatedProducts));
+    toast.success('Product updated successfully');
+    
+    setShowEditModal(false);
+    setProductToEdit(null);
+  };
+
+  const cancelEdit = () => {
+    setShowEditModal(false);
+    setProductToEdit(null);
   };
 
   const confirmDeleteProduct = () => {
@@ -75,8 +122,16 @@ const AllProductsSection: FC = () => {
                 </span>
                 <div className="flex gap-1">
                   <button
+                    onClick={() => handleEditProduct(product)}
+                    className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-blue-100 transition"
+                    title="Edit Product"
+                  >
+                    <Edit3 className="w-4 h-4 text-gray-600 hover:text-blue-600" />
+                  </button>
+                  <button
                     onClick={() => handleDeleteProduct(product.id)}
                     className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-red-100 transition"
+                    title="Delete Product"
                   >
                     <Trash2 className="w-4 h-4 text-gray-600 hover:text-red-600" />
                   </button>
@@ -134,6 +189,110 @@ const AllProductsSection: FC = () => {
                 className="flex-1 px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
               >
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Product Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">
+              Edit Product
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Product Title *
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={editFormData.title}
+                  onChange={handleEditFormChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Price *
+                </label>
+                <input
+                  type="number"
+                  name="price"
+                  value={editFormData.price}
+                  onChange={handleEditFormChange}
+                  min="0"
+                  step="0.01"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Image URL
+                </label>
+                <input
+                  type="url"
+                  name="image"
+                  value={editFormData.image}
+                  onChange={handleEditFormChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  value={editFormData.description}
+                  onChange={handleEditFormChange}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Category *
+                </label>
+                <input
+                  type="text"
+                  name="category"
+                  value={editFormData.category}
+                  onChange={handleEditFormChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Rating (1-5)
+                </label>
+                <input
+                  type="number"
+                  name="rating"
+                  value={editFormData.rating}
+                  onChange={handleEditFormChange}
+                  min="1"
+                  max="5"
+                  step="0.1"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+            <div className="flex space-x-3 mt-6">
+              <button
+                onClick={cancelEdit}
+                className="flex-1 px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveEditProduct}
+                className="flex-1 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Save Changes
               </button>
             </div>
           </div>

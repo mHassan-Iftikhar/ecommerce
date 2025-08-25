@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import NavLinks from "./components/NavLinks";
 import ActionIcons from "./components/ActionIcons";
 import AuthButtons from "./components/AuthButtons";
+import ProfileMenu from "./components/ProfileMenu";
 import MobileMenu from "./components/MobileMenu";
 import { AuthManager } from "../../../utils/AuthManager";
 
@@ -61,15 +62,20 @@ const Header: FC = () => {
 
       <div className="hidden md:flex items-center gap-3">
         <ActionIcons />
-        <AuthButtons 
-          showLogout={isAuthenticated} 
-          onLogout={handleLogout}
-        />
+        {isAuthenticated ? (
+          <ProfileMenu 
+            currentUser={currentUser}
+            onLogout={handleLogout}
+          />
+        ) : (
+          <AuthButtons />
+        )}
       </div>
 
       {/* Mobile Nav */}
       <MobileMenu 
         isAuthenticated={isAuthenticated}
+        currentUser={currentUser}
         onLogout={handleLogout}
       />
     </header>
