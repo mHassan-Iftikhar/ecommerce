@@ -3,20 +3,7 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 import App from "./App.tsx";
-import { 
-  HomeScreen, 
-  ProductsScreen, 
-  ProductDetailsScreen, 
-  CartScreen,
-  ContactScreen,
-  CategoriesScreen,
-  ProfileScreen, 
-  WishlistScreen, 
-  AdminScreen, 
-  LoginScreen, 
-  SignupScreen, 
-  ErrorScreen 
-} from "./screens";
+import { HomeScreen, ProductsScreen, ProductDetailsScreen, CategoriesScreen, CategoryDetailsScreen, ContactScreen, AdminScreen, LoginScreen, SignupScreen, ErrorScreen, CartScreen, CheckoutScreen, OrderConfirmationScreen, OrderTrackingScreen, WishlistScreen } from "./screens";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +20,18 @@ const router = createBrowserRouter([
         element: <ProductsScreen />,
       },
       {
+        path: "/categories",
+        element: <CategoriesScreen />,
+      },
+      {
+        path: "/category-details",
+        element: <CategoryDetailsScreen />,
+      },
+      {
+        path: "/contact",
+        element: <ContactScreen />,
+      },
+      {
         path: "/product/:id",
         element: <ProductDetailsScreen />,
       },
@@ -41,32 +40,30 @@ const router = createBrowserRouter([
         element: <CartScreen />,
       },
       {
-        path: "/contact",
-        element: <ContactScreen />,
+        path: "/checkout",
+        element: <CheckoutScreen />,
       },
       {
-        path: "/categories",
-        element: <CategoriesScreen />,
+        path: "/order-confirmation/:orderId",
+        element: <OrderConfirmationScreen />,
       },
       {
-        path: "/profile",
-        element: <ProfileScreen />,
+        path: "/order-tracking/:orderId",
+        element: <OrderTrackingScreen />,
       },
       {
         path: "/wishlist",
         element: <WishlistScreen />,
       },
+      {
+        path: "/auth/login",
+        element: <LoginScreen />,
+      },
+      {
+        path: "/auth/signup", 
+        element: <SignupScreen />,
+      },
     ],
-  },
-  {
-    path: "/auth/login",
-    element: <LoginScreen />,
-    errorElement: <ErrorScreen />,
-  },
-  {
-    path: "/auth/signup",
-    element: <SignupScreen />,
-    errorElement: <ErrorScreen />,
   },
   {
     path: "/admin",

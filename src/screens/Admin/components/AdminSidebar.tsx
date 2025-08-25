@@ -16,9 +16,9 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ activeSection, onSectionChange })
     { id: 'dashboard', label: 'Dashboard' },
     { id: 'users', label: 'Users' },
     { id: 'products', label: 'Add Products' },
-    { id: 'categories', label: 'Categories' },
     { id: 'orders', label: 'Orders' },
     { id: 'all-products', label: 'All Products' },
+    { id: 'categories', label: 'Categories' },
   ];
 
   return (

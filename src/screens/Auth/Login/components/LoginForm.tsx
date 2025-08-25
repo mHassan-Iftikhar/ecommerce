@@ -1,55 +1,87 @@
 import { useState, type FC } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthManager } from "../../../../utils/AuthManager";
 
-interface LoginFormProps {
-  onSubmit: (email: string, password: string) => void;
-  errorMessage?: string;
-  isLoading?: boolean;
-}
+const LoginForm: FC = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: ""
+  });
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-const LoginForm: FC<LoginFormProps> = ({
-  onSubmit,
-  errorMessage,
-  isLoading = false
-}) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(email, password);
+    setIsLoading(true);
+    setError("");
+
+    try {
+      if (!formData.email || !formData.password) {
+        setError("Please fill in all fields");
+        return;
+      }
+
+      const result = AuthManager.validateLogin(formData.email, formData.password);
+      
+      if (result.success && result.user) {
+        AuthManager.setAuth(result.user);
+        navigate("/");
+      } else {
+        setError(result.error || "Invalid email or password");
+      }
+    } catch (err) {
+      setError("An error occurred during login");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo Section */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Logo</h1>
-          <p className="text-gray-600">Welcome back</p>
+          <p className="text-gray-600">Welcome back! Please login to your account</p>
         </div>
 
         {/* Login Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900">Sign In</h2>
+            <p className="text-gray-600 mt-2">Access your account</p>
+          </div>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email
+                Email Address
               </label>
               <input
                 type="email"
                 id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-gray-50 focus:bg-white"
                 placeholder="Enter your email"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 bg-gray-50 focus:bg-white"
                 required
                 disabled={isLoading}
               />
             </div>
 
-            {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                 Password
@@ -57,66 +89,58 @@ const LoginForm: FC<LoginFormProps> = ({
               <input
                 type="password"
                 id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-gray-50 focus:bg-white"
                 placeholder="Enter your password"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 bg-gray-50 focus:bg-white"
                 required
                 disabled={isLoading}
               />
             </div>
 
-            {/* Error Message */}
-            {errorMessage && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-                {errorMessage}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                  Remember me
+                </label>
               </div>
-            )}
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className={`w-full py-3 px-4 rounded-lg font-medium transition duration-200 ${
-                isLoading
-                  ? 'bg-gray-400 text-white cursor-not-allowed'
-                  : 'bg-purple-600 text-white hover:bg-purple-700 transform hover:scale-[1.02]'
-              }`}
-            >
-              {isLoading ? (
-                <div className="flex items-center justify-center">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Logging in...
-                </div>
-              ) : (
-                'Login'
-              )}
-            </button>
+              <div className="text-sm">
+                <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+                  Forgot password?
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200"
+              >
+                {isLoading ? "Signing in..." : "Sign In"}
+              </button>
+            </div>
           </form>
 
-          {/* Signup Link */}
           <div className="mt-6 text-center">
-            <p className="text-gray-600">
+            <p className="text-sm text-gray-600">
               Don't have an account?{' '}
               <Link
-                to="/signup"
-                className="text-purple-600 hover:text-purple-700 font-medium transition duration-200"
+                to="/auth/signup"
+                className="font-medium text-blue-600 hover:text-blue-500 transition duration-200"
               >
                 Sign up here
               </Link>
             </p>
           </div>
-        </div>
-
-        {/* Back to Homepage */}
-        <div className="mt-6 text-center">
-          <Link
-            to="/"
-            className="inline-flex items-center text-gray-600 hover:text-gray-800 transition duration-200"
-          >
-            <span className="mr-2">←</span>
-            Back to Homepage
-          </Link>
         </div>
       </div>
     </div>

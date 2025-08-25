@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Header, Footer } from "../../components";
+import { toast } from "../../components/ui";
 import { 
   ProductDetailsHeader, 
   ProductImage, 
   ProductInfo,
+  ProductAccordions,
   RelatedProducts
 } from "./components";
 
@@ -13,6 +15,7 @@ interface Product {
   title: string;
   price: number;
   image: string;
+  images?: string[];
   description?: string;
   category?: string;
   rating?: number;
@@ -54,7 +57,7 @@ const ProductDetailsScreen = () => {
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
     
     if (!currentUser) {
-      alert('Please login to add items to cart');
+      toast.warning('Please login to add items to cart');
       return;
     }
 
@@ -73,7 +76,7 @@ const ProductDetailsScreen = () => {
       }
 
       localStorage.setItem(`cart_${userEmail}`, JSON.stringify(userCart));
-      alert('Product added to cart!');
+      toast.success('Product added to cart!');
     }
   };
 
@@ -81,7 +84,7 @@ const ProductDetailsScreen = () => {
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
     
     if (!currentUser) {
-      alert('Please login to add items to wishlist');
+      toast.warning('Please login to add items to wishlist');
       return;
     }
 
@@ -94,11 +97,11 @@ const ProductDetailsScreen = () => {
       const existingItem = userWishlist.find((item: Product) => item.id === productId);
 
       if (existingItem) {
-        alert('Product is already in your wishlist!');
+        toast.warning('Product is already in your wishlist!');
       } else {
         userWishlist.push(productToAdd);
         localStorage.setItem(`wishlist_${userEmail}`, JSON.stringify(userWishlist));
-        alert('Product added to wishlist!');
+        toast.success('Product added to wishlist!');
       }
     }
   };
@@ -108,17 +111,41 @@ const ProductDetailsScreen = () => {
       <div className="min-h-screen bg-gray-50">
         <Header />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-2xl shadow-lg p-6 md:p-10">
-            <div className="animate-pulse">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-                <div className="h-96 lg:h-[500px] bg-gray-200 rounded-xl"></div>
-                <div className="space-y-6">
-                  <div className="h-8 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-6 bg-gray-200 rounded w-1/2"></div>
-                  <div className="h-24 bg-gray-200 rounded"></div>
-                  <div className="h-12 bg-gray-200 rounded w-full"></div>
-                  <div className="h-12 bg-gray-200 rounded w-full"></div>
+          <div className="mb-8">
+            <div className="animate-pulse h-6 bg-gray-200 rounded w-40"></div>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+            <div className="animate-pulse space-y-4">
+              <div className="flex gap-4">
+                <div className="flex flex-col space-y-2">
+                  {Array.from({ length: 6 }, (_, i) => (
+                    <div key={i} className="w-16 h-16 bg-gray-200 rounded-lg"></div>
+                  ))}
                 </div>
+                <div className="flex-1 aspect-square bg-gray-200 rounded-xl"></div>
+              </div>
+            </div>
+            <div className="animate-pulse space-y-6">
+              <div className="space-y-3">
+                <div className="h-8 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-5 bg-gray-200 rounded w-1/2"></div>
+                <div className="h-6 bg-gray-200 rounded w-1/4"></div>
+              </div>
+              <div className="space-y-3">
+                <div className="h-5 bg-gray-200 rounded w-1/3"></div>
+                <div className="flex gap-2">
+                  <div className="h-10 bg-gray-200 rounded w-20"></div>
+                  <div className="h-10 bg-gray-200 rounded w-24"></div>
+                </div>
+              </div>
+              <div className="grid grid-cols-5 gap-2">
+                {Array.from({ length: 5 }, (_, i) => (
+                  <div key={i} className="aspect-square bg-gray-200 rounded-lg"></div>
+                ))}
+              </div>
+              <div className="space-y-2">
+                <div className="h-12 bg-gray-200 rounded-full"></div>
+                <div className="h-12 bg-gray-200 rounded-full"></div>
               </div>
             </div>
           </div>
@@ -133,8 +160,10 @@ const ProductDetailsScreen = () => {
       <div className="min-h-screen bg-gray-50">
         <Header />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <ProductDetailsHeader />
-          <div className="bg-white rounded-2xl shadow-lg p-6 md:p-10">
+          <div className="mb-8">
+            <ProductDetailsHeader />
+          </div>
+          <div className="bg-white rounded-2xl shadow-lg p-6 md:p-10 w-full">
             <div className="text-center py-16">
               <div className="text-red-500 text-2xl mb-6 font-semibold">Product not found</div>
               <Link 
@@ -152,33 +181,50 @@ const ProductDetailsScreen = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen p-6 bg-gray-50">
       <Header />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      
+      {/* Back to Products Button - Outside main container */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         <ProductDetailsHeader />
-        
+      </div>
+      
+      {/* Main Product Section Container */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Main Product Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 md:p-10 mb-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+        <div className="rounded-2xl p-6 md:p-8 lg:p-12 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+            {/* Sticky Image Gallery */}
             <ProductImage 
               image={product.image} 
-              title={product.title} 
+              title={product.title}
+              images={product.images}
             />
             
-            <ProductInfo 
-              product={product}
-              onAddToCart={handleAddToCart}
-              onAddToWishlist={handleAddToWishlist}
-            />
+            {/* Product Info */}
+            <div className="space-y-8">
+              <ProductInfo 
+                product={product}
+                onAddToCart={handleAddToCart}
+                onAddToWishlist={handleAddToWishlist}
+              />
+              
+              {/* Accordion Sections */}
+              <div className="space-y-0 border-t border-gray-200 pt-8">
+                <ProductAccordions product={product} />
+              </div>
+            </div>
           </div>
         </div>
+      </main>
 
-        {/* Related Products Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 md:p-10">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">Related Products</h2>
+      {/* Related Products Section - Outside main container */}
+      <div className="w-full bg-gray-50 py-12">
+        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
           <RelatedProducts currentProductId={product.id} category={product.category} />
         </div>
-      </main>
+      </div>
+      
       <Footer />
     </div>
   );

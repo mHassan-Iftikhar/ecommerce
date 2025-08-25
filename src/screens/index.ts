@@ -1,11 +1,14 @@
 export { default as HomeScreen } from "./Home";
 export { default as ProductsScreen } from "./Products";
 export { default as ProductDetailsScreen } from "./ProductDetails";
-export { default as CartScreen } from "./Cart";
-export { default as ContactScreen } from "./Contact";
 export { default as CategoriesScreen } from "./Categories";
-export { default as ProfileScreen } from "./Profile";
-export { default as WishlistScreen } from "./Wishlist";
+export { default as CategoryDetailsScreen } from "./CategoryDetails";
+export { default as ContactScreen } from "./Contact";
 export { default as AdminScreen } from "./Admin";
 export { default as ErrorScreen } from "./Error";
+export { default as CartScreen } from "./Cart";
+export { default as CheckoutScreen } from "./Checkout";
+export { default as OrderConfirmationScreen } from "./OrderConfirmation";
+export { default as OrderTrackingScreen } from "./OrderTracking";
+export { default as WishlistScreen } from "./Wishlist";
 export { LoginScreen, SignupScreen } from "./Auth";

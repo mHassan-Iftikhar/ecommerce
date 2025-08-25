@@ -1,13 +1,11 @@
 import type { FC } from "react";
 import { Link } from "react-router-dom";
-import ProfileDropdown from "./ProfileDropdown";
 
 interface AuthButtonsProps {
   className?: string;
   buttonClassName?: string;
   showLogout?: boolean;
   onLogout?: () => void;
-  currentUser?: any;
 }
 
 const AuthButtons: FC<AuthButtonsProps> = ({
@@ -15,12 +13,16 @@ const AuthButtons: FC<AuthButtonsProps> = ({
   buttonClassName = "px-6 py-4 rounded-lg bg-gray-100 text-black text-sm",
   showLogout = false,
   onLogout,
-  currentUser,
 }) => {
-  if (showLogout && currentUser) {
+  if (showLogout) {
     return (
-      <div className="userSection">
-        <ProfileDropdown user={currentUser} onLogout={onLogout || (() => {})} />
+      <div className="userSection flex flex-col gap-2">
+        <button
+          onClick={onLogout}
+          className="logoutBtn px-4 py-3 bg-red-600 text-white rounded-md text-sm hover:bg-red-700 transition"
+        >
+          Logout
+        </button>
       </div>
     );
   }

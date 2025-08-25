@@ -1,5 +1,6 @@
 import { useState, type FC } from "react";
 import { Edit, Trash2 } from "lucide-react";
+import { toast } from "../../../components/ui";
 
 interface Product {
   id: string;
@@ -17,6 +18,8 @@ const ProductsSection: FC = () => {
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [editingProduct, setEditingProduct] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -43,13 +46,13 @@ const ProductsSection: FC = () => {
     const { title, price, image, description, rating, category } = formData;
     
     if (!title || !price || !image || !description || !category) {
-      alert('Please fill all required fields.');
+      toast.warning('Please fill all required fields.');
       return;
     }
 
     const ratingNum = Number(rating);
     if (ratingNum < 0 || ratingNum > 5) {
-      alert('Rating must be between 0 and 5.');
+      toast.warning('Rating must be between 0 and 5.');
       return;
     }
 
@@ -96,13 +99,13 @@ const ProductsSection: FC = () => {
     const { title, price, image, description, rating, category } = formData;
     
     if (!title || !price || !image || !description || !category) {
-      alert('Please fill all required fields.');
+      toast.warning('Please fill all required fields.');
       return;
     }
 
     const ratingNum = Number(rating);
     if (ratingNum < 0 || ratingNum > 5) {
-      alert('Rating must be between 0 and 5.');
+      toast.warning('Rating must be between 0 and 5.');
       return;
     }
 
@@ -136,11 +139,25 @@ const ProductsSection: FC = () => {
   };
 
   const handleDeleteProduct = (productId: string) => {
-    if (confirm('Are you sure you want to delete this product?')) {
-      const updatedProducts = products.filter(product => product.id !== productId);
-      setProducts(updatedProducts);
-      localStorage.setItem('products', JSON.stringify(updatedProducts));
-    }
+    setProductToDelete(productId);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteProduct = () => {
+    if (!productToDelete) return;
+
+    const updatedProducts = products.filter(product => product.id !== productToDelete);
+    setProducts(updatedProducts);
+    localStorage.setItem('products', JSON.stringify(updatedProducts));
+    toast.success('Product deleted successfully');
+    
+    setShowDeleteModal(false);
+    setProductToDelete(null);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setProductToDelete(null);
   };
 
   return (
@@ -288,6 +305,34 @@ const ProductsSection: FC = () => {
       {filteredProducts.length === 0 && searchQuery && (
         <div className="text-center py-8 text-gray-500">
           No products found matching "{searchQuery}"
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">
+              Confirm Delete
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete this product? This action cannot be undone.
+            </p>
+            <div className="flex space-x-3">
+              <button
+                onClick={cancelDelete}
+                className="flex-1 px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteProduct}
+                className="flex-1 px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -64,12 +64,14 @@ const Header: FC = () => {
         <AuthButtons 
           showLogout={isAuthenticated} 
           onLogout={handleLogout}
-          currentUser={currentUser}
         />
       </div>
 
       {/* Mobile Nav */}
-      <MobileMenu />
+      <MobileMenu 
+        isAuthenticated={isAuthenticated}
+        onLogout={handleLogout}
+      />
     </header>
   );
 };

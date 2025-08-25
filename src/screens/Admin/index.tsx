@@ -6,9 +6,9 @@ import {
   Dashboard, 
   UsersSection, 
   AddProductsSection,
-  CategoriesSection,
   AllProductsSection,
-  OrdersSection 
+  OrdersSection,
+  CategoriesSection 
 } from "./components";
 
 const AdminScreen = () => {
@@ -32,12 +32,12 @@ const AdminScreen = () => {
         return <UsersSection />;
       case 'products':
         return <AddProductsSection />;
-      case 'categories':
-        return <CategoriesSection />;
       case 'all-products':
         return <AllProductsSection />;
       case 'orders':
         return <OrdersSection />;
+      case 'categories':
+        return <CategoriesSection />;
       default:
         return <Dashboard />;
     }

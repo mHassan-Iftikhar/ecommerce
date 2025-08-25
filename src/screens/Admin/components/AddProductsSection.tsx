@@ -1,13 +1,17 @@
 import { useState, type FC } from "react";
+import { Plus, X } from "lucide-react";
+import { toast } from "../../../components/ui";
 
 interface Product {
   id: string;
   title: string;
   price: number;
   image: string;
+  images?: string[];
   description: string;
   rating: number;
   category: string;
+  inStock: boolean;
 }
 
 const AddProductsSection: FC = () => {
@@ -18,9 +22,11 @@ const AddProductsSection: FC = () => {
     image: "",
     description: "",
     rating: "",
-    category: ""
+    category: "",
+    inStock: true
   });
 
+  const [additionalImages, setAdditionalImages] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -30,33 +36,41 @@ const AddProductsSection: FC = () => {
     });
   };
 
+  const addImageField = () => {
+    setAdditionalImages([...additionalImages, ""]);
+  };
+
+  const removeImageField = (index: number) => {
+    setAdditionalImages(additionalImages.filter((_, i) => i !== index));
+  };
+
+  const updateImageField = (index: number, value: string) => {
+    const updated = [...additionalImages];
+    updated[index] = value;
+    setAdditionalImages(updated);
+  };
+
   const handleAddProduct = async () => {
-    const { title, price, image, description, rating, category } = formData;
+    const { title, price, image, description, rating, category, inStock } = formData;
     
-    if (!title || !price || !image || !description || !category) {
-      alert('Please fill all required fields.');
-      return;
-    }
-
-    const ratingNum = Number(rating);
-    if (ratingNum < 0 || ratingNum > 5) {
-      alert('Rating must be between 0 and 5.');
-      return;
-    }
-
+    // No validations - admin can add anything
     setIsSubmitting(true);
 
     try {
       const existingProducts = JSON.parse(localStorage.getItem('products') || '[]');
       
+      const allImages = [image, ...additionalImages.filter(img => img.trim() !== "")];
+      
       const newProduct: Product = {
         id: Date.now().toString(),
-        title,
-        price: Number(price),
-        image,
-        description,
-        rating: ratingNum,
-        category
+        title: title || "Untitled Product",
+        price: Number(price) || 0,
+        image: image || "https://via.placeholder.com/300",
+        images: allImages.length > 1 ? allImages : undefined,
+        description: description || "",
+        rating: Number(rating) || 0,
+        category: category || "",
+        inStock: inStock
       };
 
       const updatedProducts = [...existingProducts, newProduct];
@@ -69,12 +83,14 @@ const AddProductsSection: FC = () => {
         image: "",
         description: "",
         rating: "",
-        category: ""
+        category: "",
+        inStock: true
       });
+      setAdditionalImages([]);
 
-      alert('Product added successfully!');
+      toast.success('Product added successfully!');
     } catch (error) {
-      alert('Error adding product. Please try again.');
+      toast.error('Error adding product. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -91,7 +107,7 @@ const AddProductsSection: FC = () => {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Product Name *
+              Product Name
             </label>
             <input
               type="text"
@@ -105,7 +121,7 @@ const AddProductsSection: FC = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Product Price *
+              Product Price
             </label>
             <input
               type="number"
@@ -121,21 +137,57 @@ const AddProductsSection: FC = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Product Image URL *
+              Main Product Image URL
             </label>
             <input
               type="text"
               name="image"
               value={formData.image}
               onChange={handleInputChange}
-              placeholder="Enter image URL"
+              placeholder="Enter main image URL"
               className="border border-gray-300 p-3 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
+          {/* Additional Images Section */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Additional Images (Optional)
+              </label>
+              <button
+                type="button"
+                onClick={addImageField}
+                className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
+              >
+                <Plus className="w-4 h-4" />
+                Add Image
+              </button>
+            </div>
+            
+            {additionalImages.map((imageUrl, index) => (
+              <div key={index} className="flex gap-2 mb-2">
+                <input
+                  type="text"
+                  value={imageUrl}
+                  onChange={(e) => updateImageField(index, e.target.value)}
+                  placeholder={`Additional image URL ${index + 1}`}
+                  className="border border-gray-300 p-3 rounded-lg flex-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeImageField(index)}
+                  className="w-12 h-12 flex items-center justify-center text-red-600 hover:text-red-800 border border-gray-300 rounded-lg hover:border-red-300"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Product Description *
+              Product Description
             </label>
             <textarea
               name="description"
@@ -166,7 +218,7 @@ const AddProductsSection: FC = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Product Category *
+              Product Category
             </label>
             <input
               type="text"
@@ -176,6 +228,34 @@ const AddProductsSection: FC = () => {
               placeholder="Enter product category"
               className="border border-gray-300 p-3 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Stock Status
+            </label>
+            <div className="flex gap-4">
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="inStock"
+                  checked={formData.inStock === true}
+                  onChange={() => setFormData({ ...formData, inStock: true })}
+                  className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
+                />
+                <span className="ml-2 text-sm text-gray-700">In Stock</span>
+              </label>
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="inStock"
+                  checked={formData.inStock === false}
+                  onChange={() => setFormData({ ...formData, inStock: false })}
+                  className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
+                />
+                <span className="ml-2 text-sm text-gray-700">Out of Stock</span>
+              </label>
+            </div>
           </div>
 
           <button

@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { Link } from "react-router-dom";
-import { Heart, ShoppingCart, ShieldUser } from "lucide-react";
+import { Heart, ShoppingCart, User } from "lucide-react";
 import { AuthManager } from "../../../../utils/AuthManager";
 
 interface ActionIconsProps {
@@ -19,7 +19,7 @@ const ActionIcons: FC<ActionIconsProps> = ({
       {/* Admin Panel Icon - Only show for admin */}
       {isAdmin && (
         <Link to="/admin" className={`${iconClassName} adminPanel`} title="Admin Panel">
-          <ShieldUser />
+          <User />
         </Link>
       )}
       

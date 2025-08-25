@@ -1,27 +1,25 @@
 import { type FC } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
 const ContactHeader: FC = () => {
-  const navigate = useNavigate();
-
   return (
-    <div className="w-full p-5">
-      <div className="max-w-6xl mx-auto">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors mb-8"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          <span>Back</span>
-        </button>
-        
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Contact Us</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            We'd love to hear from you. Send us a message and we'll respond as soon as possible.
-          </p>
+    <div className="w-full px-5 mt-5">
+      {/* Back Button */}
+      <Link 
+        to="/" 
+        className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4 mr-2" />
+        Back to Store
+      </Link>
+      
+      {/* Page Title */}
+      <div className="flex items-center gap-2 mb-8 mt-6">
+        <div className="rounded-full w-6 sm:w-8 h-6 sm:h-8 border border-black flex justify-center items-center">
+          <div className="w-4 sm:w-6 h-4 sm:h-6 rounded-full bg-black"></div>
         </div>
+        <h1 className="text-2xl sm:text-3xl md:text-5xl font-light">Contact Us</h1>
       </div>
     </div>
   );

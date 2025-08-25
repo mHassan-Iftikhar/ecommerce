@@ -1,6 +1,7 @@
 import { useEffect, useState, type FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { ShoppingCart, Heart } from "lucide-react";
+import { toast } from "../../../components/ui";
 
 interface Product {
   id: string;
@@ -60,7 +61,7 @@ const RelatedProducts: FC<RelatedProductsProps> = ({ currentProductId, category 
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
     
     if (!currentUser) {
-      alert('Please login to add items to cart');
+      toast.warning('Please login to add items to cart');
       return;
     }
 
@@ -79,7 +80,7 @@ const RelatedProducts: FC<RelatedProductsProps> = ({ currentProductId, category 
       }
 
       localStorage.setItem(`cart_${userEmail}`, JSON.stringify(userCart));
-      alert('Product added to cart!');
+      toast.success('Product added to cart!');
     }
   };
 
@@ -89,7 +90,7 @@ const RelatedProducts: FC<RelatedProductsProps> = ({ currentProductId, category 
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
     
     if (!currentUser) {
-      alert('Please login to add items to wishlist');
+      toast.warning('Please login to add items to wishlist');
       return;
     }
 
@@ -102,29 +103,48 @@ const RelatedProducts: FC<RelatedProductsProps> = ({ currentProductId, category 
       const existingItem = userWishlist.find((item: Product) => item.id === productId);
 
       if (existingItem) {
-        alert('Product is already in your wishlist!');
+        toast.warning('Product is already in your wishlist!');
       } else {
         userWishlist.push(productToAdd);
         localStorage.setItem(`wishlist_${userEmail}`, JSON.stringify(userWishlist));
-        alert('Product added to wishlist!');
+        toast.success('Product added to wishlist!');
       }
     }
   };
 
   if (relatedProducts.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-500">
-        <p>No related products found</p>
+      <div className="w-full py-8">
+        {/* Section Header - Homepage Style */}
+        <div className="flex items-center gap-2 mb-8">
+          <div className="rounded-full w-6 sm:w-8 h-6 sm:h-8 border border-black flex justify-center items-center">
+            <div className="w-4 sm:w-6 h-4 sm:h-6 rounded-full bg-black"></div>
+          </div>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-light">Related Products</h2>
+        </div>
+        
+        <div className="text-center py-12 text-gray-500">
+          <p>No related products found</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="w-full py-8">
+      {/* Section Header - Homepage Style */}
+      <div className="flex items-center gap-2 mb-8">
+        <div className="rounded-full w-6 sm:w-8 h-6 sm:h-8 border border-black flex justify-center items-center">
+          <div className="w-4 sm:w-6 h-4 sm:h-6 rounded-full bg-black"></div>
+        </div>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-light">Related Products</h2>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {relatedProducts.map((product) => (
         <div
           key={product.id}
-          className="bg-gray-50 rounded-xl p-4 hover:shadow-lg transition-all duration-300 cursor-pointer group"
+          className="w-70 rounded-xl p-4 hover:shadow-lg transition-all duration-300 cursor-pointer group border border-gray-100"
           onClick={() => handleProductClick(product.id)}
         >
           <div className="relative mb-4">
@@ -166,6 +186,7 @@ const RelatedProducts: FC<RelatedProductsProps> = ({ currentProductId, category 
           </div>
         </div>
       ))}
+      </div>
     </div>
   );
 };

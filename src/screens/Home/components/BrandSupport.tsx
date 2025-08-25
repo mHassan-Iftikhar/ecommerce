@@ -31,16 +31,30 @@ const BrandSupport: FC<BrandSupportProps> = ({
         {title}
       </h2>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 w-full">
-        {brands.map((brand) => (
-          <div key={brand.id} className="h-32 sm:h-40 bg-[#F3F3F3] flex items-center justify-center rounded-xl w-full">
-            <img 
-              src={brand.imageSrc} 
-              alt={brand.altText} 
-              className="w-16 sm:w-24 h-16 sm:h-24 object-contain" 
-            />
-          </div>
-        ))}
+      {/* Marquee Container */}
+      <div className="w-full overflow-hidden">
+        <div className="flex animate-marquee">
+          {/* First set of brands */}
+          {brands.map((brand) => (
+            <div key={brand.id} className="h-32 sm:h-40 bg-[#F3F3F3] flex items-center justify-center rounded-xl min-w-[180px] sm:min-w-[220px] mx-4 flex-shrink-0">
+              <img 
+                src={brand.imageSrc} 
+                alt={brand.altText} 
+                className="w-16 sm:w-24 h-16 sm:h-24 object-contain" 
+              />
+            </div>
+          ))}
+          {/* Duplicate set for seamless scrolling */}
+          {brands.map((brand) => (
+            <div key={`duplicate-${brand.id}`} className="h-32 sm:h-40 bg-[#F3F3F3] flex items-center justify-center rounded-xl min-w-[180px] sm:min-w-[220px] mx-4 flex-shrink-0">
+              <img 
+                src={brand.imageSrc} 
+                alt={brand.altText} 
+                className="w-16 sm:w-24 h-16 sm:h-24 object-contain" 
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

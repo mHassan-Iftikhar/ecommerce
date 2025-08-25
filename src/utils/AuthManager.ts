@@ -12,6 +12,8 @@ export class AuthManager {
 
   static setAuth(userData: User): void {
     localStorage.setItem(this.AUTH_KEY, JSON.stringify(userData));
+    // Dispatch custom event to notify components
+    window.dispatchEvent(new Event('authStateChanged'));
   }
 
   static getCurrentUser(): User | null {
@@ -30,6 +32,8 @@ export class AuthManager {
 
   static logout(): void {
     localStorage.removeItem(this.AUTH_KEY);
+    // Dispatch custom event to notify components
+    window.dispatchEvent(new Event('authStateChanged'));
   }
 
   static validateLogin(email: string, password: string): { success: boolean; user?: User; error?: string } {

@@ -1,12 +1,13 @@
 import type { FC } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Instagram, Facebook, Linkedin } from "lucide-react";
+import { toast } from "../../ui";
 
 const Footer: FC = () => {
   const handleNewsletterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Add your newsletter subscription logic here
-    alert("Thanks for subscribing!");
+    toast.success("Thanks for subscribing!");
   };
 
   const scrollToTop = () => {

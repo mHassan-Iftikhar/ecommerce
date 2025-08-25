@@ -1,6 +1,5 @@
 import { useState, type FC } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthManager } from "../../../../utils/AuthManager";
 
 const SignupForm: FC = () => {
   const navigate = useNavigate();
@@ -13,86 +12,55 @@ const SignupForm: FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-    // Clear error when user starts typing
-    if (error) setError("");
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const validateForm = () => {
-    const { username, email, password } = formData;
-
-    if (!username.trim() || !email.trim() || !password.trim()) {
-      setError("Please fill in all fields");
-      return false;
-    }
-
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return false;
-    }
-
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError("Please enter a valid email address");
-      return false;
-    }
-
-    return true;
-  };
-
-  const handleSignup = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateForm()) return;
-
     setIsLoading(true);
     setError("");
 
     try {
-      const { username, email, password } = formData;
-      
+      if (!formData.username || !formData.email || !formData.password) {
+        setError("Please fill in all fields");
+        return;
+      }
+
+      if (formData.password.length < 6) {
+        setError("Password must be at least 6 characters long");
+        return;
+      }
+
+      // Get existing users
+      const existingUsers = JSON.parse(localStorage.getItem("user") || "[]");
+
       // Check if user already exists
-      const usersArray = JSON.parse(localStorage.getItem("user") || "[]");
-      const userExists = usersArray.some((user: any) => user.email === email);
+      const userExists = existingUsers.some((user: any) => 
+        user.email === formData.email || user.username === formData.username
+      );
 
       if (userExists) {
-        setError("User already registered!");
-        setIsLoading(false);
+        setError("User with this email or username already exists");
         return;
       }
 
       // Create new user
-      const userData = {
+      const newUser = {
         id: Date.now(),
-        username: username.trim(),
-        email: email.trim(),
-        password
+        username: formData.username,
+        email: formData.email,
+        password: formData.password
       };
 
-      usersArray.push(userData);
-      localStorage.setItem("user", JSON.stringify(usersArray));
+      // Save to localStorage
+      const updatedUsers = [...existingUsers, newUser];
+      localStorage.setItem("user", JSON.stringify(updatedUsers));
 
-      // Automatically log in the user after signup
-      const loginData = {
-        id: userData.id,
-        username: userData.username,
-        email: userData.email,
-        loginTime: new Date().toISOString()
-      };
-      
-      AuthManager.setAuth(loginData);
-
-      // Redirect to home page
-      setTimeout(() => {
-        navigate('/');
-      }, 1000);
-
-    } catch (error) {
-      setError("An error occurred during signup. Please try again.");
+      // Navigate to login
+      navigate("/auth/login");
+    } catch (err) {
+      setError("An error occurred during signup");
     } finally {
       setIsLoading(false);
     }
@@ -109,8 +77,18 @@ const SignupForm: FC = () => {
 
         {/* Signup Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-          <form onSubmit={handleSignup} className="space-y-6">
-            {/* Username Field */}
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900">Create Account</h2>
+            <p className="text-gray-600 mt-2">Join us today!</p>
+          </div>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
                 Username
@@ -123,14 +101,14 @@ const SignupForm: FC = () => {
                 onChange={handleInputChange}
                 placeholder="Enter your username"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-gray-50 focus:bg-white"
+                required
                 disabled={isLoading}
               />
             </div>
 
-            {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email
+                Email Address
               </label>
               <input
                 type="email"
@@ -140,11 +118,11 @@ const SignupForm: FC = () => {
                 onChange={handleInputChange}
                 placeholder="Enter your email"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-gray-50 focus:bg-white"
+                required
                 disabled={isLoading}
               />
             </div>
 
-            {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                 Password
@@ -155,63 +133,51 @@ const SignupForm: FC = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                placeholder="Enter your password"
+                placeholder="Enter your password (min 6 characters)"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-gray-50 focus:bg-white"
+                required
                 disabled={isLoading}
               />
             </div>
 
-            {/* Error Message */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-                {error}
-              </div>
-            )}
+            <div className="flex items-center">
+              <input
+                id="agree-terms"
+                name="agree-terms"
+                type="checkbox"
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                required
+              />
+              <label htmlFor="agree-terms" className="ml-2 block text-sm text-gray-900">
+                I agree to the{' '}
+                <a href="#" className="text-blue-600 hover:text-blue-500">
+                  Terms and Conditions
+                </a>
+              </label>
+            </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className={`w-full py-3 px-4 rounded-lg font-medium transition duration-200 ${
-                isLoading
-                  ? 'bg-gray-400 text-white cursor-not-allowed'
-                  : 'bg-blue-600 text-white hover:bg-blue-700 transform hover:scale-[1.02]'
-              }`}
-            >
-              {isLoading ? (
-                <div className="flex items-center justify-center">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Creating Account...
-                </div>
-              ) : (
-                'Sign Up'
-              )}
-            </button>
+            <div>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200"
+              >
+                {isLoading ? "Creating account..." : "Create Account"}
+              </button>
+            </div>
           </form>
 
-          {/* Login Link */}
           <div className="mt-6 text-center">
-            <p className="text-gray-600">
+            <p className="text-sm text-gray-600">
               Already have an account?{' '}
               <Link
-                to="/login"
-                className="text-blue-600 hover:text-blue-700 font-medium transition duration-200"
+                to="/auth/login"
+                className="font-medium text-blue-600 hover:text-blue-500 transition duration-200"
               >
-                Login here
+                Sign in here
               </Link>
             </p>
           </div>
-        </div>
-
-        {/* Back to Homepage */}
-        <div className="mt-6 text-center">
-          <Link
-            to="/"
-            className="inline-flex items-center text-gray-600 hover:text-gray-800 transition duration-200"
-          >
-            <span className="mr-2">←</span>
-            Back to Homepage
-          </Link>
         </div>
       </div>
     </div>

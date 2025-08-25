@@ -1,4 +1,5 @@
 import { useState } from "react";
+// import { useNavigate } from "react-router-dom";
 import { Header, Footer } from "../../components";
 import { ContactHeader, ContactForm, ContactInfo } from "./components";
 
@@ -14,6 +15,7 @@ interface ContactMessage {
 }
 
 const ContactScreen = () => {
+//   const navigate = useNavigate();
   const [notification, setNotification] = useState<{
     message: string;
     type: 'success' | 'error';

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { RootLayout } from "../../layouts";
+import { toast } from "../../components/ui";
 import { SectionHeader } from "../Home/components";
 import { BackButton, SearchAndFilter, ProductGrid, type Product } from "./components";
 
@@ -105,7 +106,7 @@ const ProductsScreen = () => {
       }
 
       localStorage.setItem(`cart_${userEmail}`, JSON.stringify(userCart));
-      alert('Product added to cart!');
+      toast.success('Product added to cart!');
     }
   };
 
@@ -127,11 +128,11 @@ const ProductsScreen = () => {
       const existingItem = userWishlist.find((item: Product) => item.id === productId);
 
       if (existingItem) {
-        alert('Product is already in your wishlist!');
+        toast.warning('Product is already in your wishlist!');
       } else {
         userWishlist.push(product);
         localStorage.setItem(`wishlist_${userEmail}`, JSON.stringify(userWishlist));
-        alert('Product added to wishlist!');
+        toast.success('Product added to wishlist!');
       }
     }
   };

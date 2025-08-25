@@ -4,7 +4,12 @@ import NavLinks from "./NavLinks";
 import AuthButtons from "./AuthButtons";
 import ActionIcons from "./ActionIcons";
 
-const MobileMenu: FC = () => {
+interface MobileMenuProps {
+  isAuthenticated?: boolean;
+  onLogout?: () => void;
+}
+
+const MobileMenu: FC<MobileMenuProps> = ({ isAuthenticated = false, onLogout }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -28,7 +33,8 @@ const MobileMenu: FC = () => {
           <AuthButtons
             className="flex flex-col gap-2"
             buttonClassName="px-6 py-3 rounded-lg bg-gray-100 text-black text-sm"
-            showLogout={false} // Adjust based on auth state
+            showLogout={isAuthenticated}
+            onLogout={onLogout}
           />
         </div>
       )}
